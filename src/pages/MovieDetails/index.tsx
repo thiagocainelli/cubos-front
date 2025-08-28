@@ -86,7 +86,7 @@ const MovieDetailsPage = () => {
           className="w-full rounded-[4px]"
           style={{
             backgroundColor:
-              theme === "light" ? "rgba(255, 255, 255, 1)" : "#121113",
+              theme === "light" ? "rgba(255, 255, 255, 0.7)" : "#121113",
           }}
         >
           <div

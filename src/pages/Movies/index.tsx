@@ -7,8 +7,10 @@ import { SearchOutlined } from "@ant-design/icons";
 import Text from "../../components/Text";
 import MovieDrawer from "../../components/MovieDrawer";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const MoviesPage = () => {
+  const { theme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
@@ -121,14 +123,30 @@ const MoviesPage = () => {
           </div>
 
           {/* Lista de filmes */}
-          <div className="bg-[#EBEAF814] p-[24px] rounded-[4px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div
+            className={`p-[24px] ${
+              theme === "light" ? "bg-[#ffff]/50" : "bg-[#EBEAF814]"
+            } rounded-[4px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6`}
+          >
             {loading ? (
               // Loading state
               Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="animate-pulse">
-                  <div className="bg-gray-200 h-64 rounded-lg mb-2"></div>
-                  <div className="bg-gray-200 h-4 rounded w-3/4 mb-2"></div>
-                  <div className="bg-gray-200 h-3 rounded w-1/2"></div>
+                  <div
+                    className={`${
+                      theme === "light" ? "bg-gray-200" : "bg-gray-600"
+                    } h-64 rounded-lg mb-2`}
+                  ></div>
+                  <div
+                    className={`${
+                      theme === "light" ? "bg-gray-200" : "bg-gray-600"
+                    } h-4 rounded w-3/4 mb-2`}
+                  ></div>
+                  <div
+                    className={`${
+                      theme === "light" ? "bg-gray-200" : "bg-gray-600"
+                    } h-3 rounded w-1/2`}
+                  ></div>
                 </div>
               ))
             ) : movies.length > 0 ? (
