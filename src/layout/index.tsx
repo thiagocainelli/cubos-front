@@ -18,20 +18,26 @@ const LayoutBase = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       <Layout
-        className={`flex flex-1 flex-col overflow-auto min-h-screen`}
-        style={{
-          backgroundImage: `url(${background})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
-        }}
+        className={`flex flex-1 flex-col overflow-auto min-h-screen relative`}
       >
+        {/* Fundo com filtro grayscale */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url(${background})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            filter: "grayscale(100%)",
+          }}
+        />
+
         <HeaderLayout />
 
         <Layout.Content className={`flex-1 flex relative`}>
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 z-0"
             style={{
               background: `linear-gradient(
                   to bottom,
@@ -44,7 +50,9 @@ const LayoutBase = ({ children }: { children: React.ReactNode }) => {
           />
 
           {/* Conteúdo com z-index para ficar sobre o gradiente */}
-          <div className="relative z-10 flex-1 flex md:p-7 p-3">{children}</div>
+          <div className="relative z-10 flex-1 flex max-w-7xl mx-auto md:p-7 p-3">
+            {children}
+          </div>
         </Layout.Content>
 
         <FooterLayout />

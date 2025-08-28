@@ -8,10 +8,13 @@ import LetterO from "../../../public/images/letter-o.png";
 import LetterS from "../../../public/images/letter-s.png";
 import Button from "../../components/Button";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const HeaderLayout = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, signOutData } = useAuth();
+
+  const navigate = useNavigate();
 
   const getHeaderStyles = () => {
     return {
@@ -30,7 +33,10 @@ const HeaderLayout = () => {
       style={getHeaderStyles()}
     >
       <div className="flex items-center gap-5 flex-wrap">
-        <div className="flex items-center gap-4">
+        <div
+          onClick={() => navigate("/movies")}
+          className="flex items-center gap-4 cursor-pointer"
+        >
           <div className="flex items-center gap-1">
             <img
               src={Square}
