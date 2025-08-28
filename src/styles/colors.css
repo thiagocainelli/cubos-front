@@ -1,0 +1,140 @@
+:root {
+  /* Purple Dark */
+  --purple-dark-1: #0a0a0a;
+  --purple-dark-2: #1a1a1a;
+  --purple-dark-3: #2a2a2a;
+  --purple-dark-4: #3a3a3a;
+  --purple-dark-5: #4a4a4a;
+  --purple-dark-6: #5a5a5a;
+  --purple-dark-7: #6a6a6a;
+  --purple-dark-8: #7a7a7a;
+  --purple-dark-9: #8a8a8a;
+  --purple-dark-10: #9a9a9a;
+  --purple-dark-11: #aa9a9a;
+  --purple-dark-12: #ba9a9a;
+
+  /* Purple Dark Alpha */
+  --purple-dark-alpha-1: rgba(10, 10, 10, 0.9);
+  --purple-dark-alpha-2: rgba(26, 26, 26, 0.9);
+  --purple-dark-alpha-3: rgba(42, 42, 42, 0.9);
+  --purple-dark-alpha-4: rgba(58, 58, 58, 0.9);
+  --purple-dark-alpha-5: rgba(74, 74, 74, 0.9);
+  --purple-dark-alpha-6: rgba(90, 90, 90, 0.9);
+  --purple-dark-alpha-7: rgba(106, 106, 106, 0.9);
+  --purple-dark-alpha-8: rgba(122, 122, 122, 0.9);
+  --purple-dark-alpha-9: rgba(138, 138, 138, 0.9);
+  --purple-dark-alpha-10: rgba(154, 154, 154, 0.9);
+  --purple-dark-alpha-11: rgba(170, 154, 154, 0.9);
+  --purple-dark-alpha-12: rgba(186, 154, 154, 0.9);
+
+  /* Purple - Fundo Branco */
+  --purple-1: #faf5ff;
+  --purple-2: #f3e8ff;
+  --purple-3: #e9d5ff;
+  --purple-4: #d8b4fe;
+  --purple-5: #c084fc;
+  --purple-6: #a855f7;
+  --purple-7: #9333ea;
+  --purple-8: #7c3aed;
+  --purple-9: #6b21a8;
+  --purple-10: #581c87;
+  --purple-11: #3b0764;
+  --purple-12: #240a3a;
+
+  /* Purple Alpha */
+  --purple-alpha-1: rgba(250, 245, 255, 0.9);
+  --purple-alpha-2: rgba(243, 232, 255, 0.9);
+  --purple-alpha-3: rgba(233, 213, 255, 0.9);
+  --purple-alpha-4: rgba(216, 180, 254, 0.9);
+  --purple-alpha-5: rgba(192, 132, 252, 0.9);
+  --purple-alpha-6: rgba(168, 85, 247, 0.9);
+  --purple-alpha-7: rgba(147, 51, 234, 0.9);
+  --purple-alpha-8: rgba(124, 58, 237, 0.9);
+  --purple-alpha-9: rgba(107, 33, 168, 0.9);
+  --purple-alpha-10: rgba(88, 28, 135, 0.9);
+  --purple-alpha-11: rgba(59, 7, 100, 0.9);
+  --purple-alpha-12: rgba(36, 10, 58, 0.9);
+
+  /* Mauve Dark - Fundo Preto */
+  --mauve-dark-1: #0a0a0a;
+  --mauve-dark-2: #1a1a1a;
+  --mauve-dark-3: #2a2a2a;
+  --mauve-dark-4: #3a3a3a;
+  --mauve-dark-5: #4a4a4a;
+  --mauve-dark-6: #5a5a5a;
+  --mauve-dark-7: #6a6a6a;
+  --mauve-dark-8: #7a7a7a;
+  --mauve-dark-9: #8a8a8a;
+  --mauve-dark-10: #9a9a9a;
+  --mauve-dark-11: #aa9a9a;
+  --mauve-dark-12: #ba9a9a;
+
+  /* Mauve Dark Alpha */
+  --mauve-dark-alpha-1: rgba(10, 10, 10, 0.9);
+  --mauve-dark-alpha-2: rgba(26, 26, 26, 0.9);
+  --mauve-dark-alpha-3: rgba(42, 42, 42, 0.9);
+  --mauve-dark-alpha-4: rgba(58, 58, 58, 0.9);
+  --mauve-dark-alpha-5: rgba(74, 74, 74, 0.9);
+  --mauve-dark-alpha-6: rgba(90, 90, 90, 0.9);
+  --mauve-dark-alpha-7: rgba(106, 106, 106, 0.9);
+  --mauve-dark-alpha-8: rgba(122, 122, 122, 0.9);
+  --mauve-dark-alpha-9: rgba(138, 138, 138, 0.9);
+  --mauve-dark-alpha-10: rgba(154, 154, 154, 0.9);
+  --mauve-dark-alpha-11: rgba(170, 154, 154, 0.9);
+  --mauve-dark-alpha-12: rgba(186, 154, 154, 0.9);
+
+  /* Mauve - Fundo Branco */
+  --mauve-1: #fafafa;
+  --mauve-2: #f5f5f5;
+  --mauve-3: #e5e5e5;
+  --mauve-4: #d4d4d4;
+  --mauve-5: #a3a3a3;
+  --mauve-6: #737373;
+  --mauve-7: #525252;
+  --mauve-8: #404040;
+  --mauve-9: #262626;
+  --mauve-10: #171717;
+  --mauve-11: #0a0a0a;
+  --mauve-12: #000000;
+
+  /* Mauve Alpha */
+  --mauve-alpha-1: rgba(250, 250, 250, 0.9);
+  --mauve-alpha-2: rgba(245, 245, 245, 0.9);
+  --mauve-alpha-3: rgba(229, 229, 229, 0.9);
+  --mauve-alpha-4: rgba(212, 212, 212, 0.9);
+  --mauve-alpha-5: rgba(163, 163, 163, 0.9);
+  --mauve-alpha-6: rgba(115, 115, 115, 0.9);
+  --mauve-alpha-7: rgba(82, 82, 82, 0.9);
+  --mauve-alpha-8: rgba(64, 64, 64, 0.9);
+  --mauve-alpha-9: rgba(38, 38, 38, 0.9);
+  --mauve-alpha-10: rgba(23, 23, 23, 0.9);
+  --mauve-alpha-11: rgba(10, 10, 10, 0.9);
+  --mauve-alpha-12: rgba(0, 0, 0, 0.9);
+
+  /* Cores principais para uso no projeto */
+  --primary: var(--purple-6);
+  --primary-dark: var(--purple-8);
+  --primary-light: var(--purple-4);
+  --secondary: var(--mauve-6);
+  --background: var(--mauve-1);
+  --background-dark: var(--mauve-dark-1);
+  --text-primary: var(--mauve-12);
+  --text-secondary: var(--mauve-7);
+  --text-light: var(--mauve-1);
+
+  /* Variáveis dinâmicas para temas */
+  --current-background: var(--mauve-1);
+  --current-text: var(--mauve-12);
+  --current-primary: var(--purple-6);
+
+  --button-bg-primary: #8e4ec6;
+  --button-bg-secondary: #b744f714;
+  --button-bg-hover-primary: #9a5cd0;
+  --button-bg-hover-secondary: #c150ff2e;
+  --button-bg-active-primary: #8457aa;
+  --button-bg-active-secondary: #b412f90a;
+  --button-bg-disabled-primary: #6f6d78;
+  --button-bg-disabled-secondary: #6f6d78;
+  --button-text: #ffffff;
+  --button-text-disabled: #ffffff;
+}

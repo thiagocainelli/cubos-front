@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { parseCookies, destroyCookie, setCookie } from "nookies";
 
@@ -13,7 +19,6 @@ type AuthContextData = {
   signInByEmail: (email: string, password: string) => Promise<boolean>;
   signOutData: () => Promise<void>;
   user: ReadUsersDto | undefined;
-  isAuthenticated: boolean;
   controllerAtt: boolean;
   setControllerAtt: (value: boolean) => void;
 };
@@ -23,7 +28,7 @@ export const AuthContext = createContext({} as AuthContextData);
 let authChannel: BroadcastChannel;
 
 export async function signOutData() {
-  destroyCookie(undefined, "auth.token", {
+  destroyCookie(undefined, "auth.token.cubos", {
     path: "/",
   });
   window.location.href = "/";
@@ -32,24 +37,20 @@ export async function signOutData() {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<ReadUsersDto>();
   const [controllerAtt, setControllerAtt] = useState(false);
+  const { "auth.token.cubos": token } = parseCookies();
 
-  const isAuthenticated = !!user;
+  console.log("token", token);
 
   const getUserInfos = async () => {
-    const { "auth.token": token } = parseCookies();
+    try {
+      const response: ReadUsersDto | undefined = await verifyToken();
+      if (response) {
+        const { uuid, name, email, createdAt, updatedAt } = response;
 
-    if (token) {
-      try {
-        const response: ReadUsersDto | undefined = await verifyToken();
-
-        if (response) {
-          const { uuid, name, email, createdAt, updatedAt } = response;
-
-          setUser({ uuid, name, email, createdAt, updatedAt });
-        }
-      } catch (error) {
-        signOutData();
+        setUser({ uuid, name, email, createdAt, updatedAt });
       }
+    } catch (error) {
+      signOutData();
     }
   };
 
@@ -64,15 +65,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (!response) return false;
+      const { token, usersData } = response;
 
-      const { accessToken, userData } = response;
-
-      setCookie(undefined, "auth.token", accessToken, {
+      // Set cookie first
+      setCookie(undefined, "auth.token.cubos", token, {
         maxAge: 60 * 60 * 24 * 30,
         path: "/",
       });
 
-      if (userData) {
+      if (usersData) {
+        setUser(usersData);
         return true;
       }
 
@@ -98,15 +100,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   useEffect(() => {
-    getUserInfos();
-  }, []);
+    if (
+      token &&
+      token !== "" &&
+      token !== undefined &&
+      token !== null &&
+      token !== "undefined"
+    ) {
+      getUserInfos();
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider
       value={{
         signInByEmail,
         signOutData,
-        isAuthenticated,
         user,
         controllerAtt,
         setControllerAtt,
@@ -116,3 +125,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  return context;
+};

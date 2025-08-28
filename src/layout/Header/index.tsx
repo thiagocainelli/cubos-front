@@ -1,29 +1,89 @@
-import { useContext } from "react";
-import { Switch } from "antd";
 import { MoonFilled, SunFilled } from "@ant-design/icons";
-import { ThemeContext } from "../../contexts/ThemeContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import Square from "../../../public/images/square.png";
+import LetterC from "../../../public/images/letter-c.png";
+import LetterU from "../../../public/images/letter-u.png";
+import LetterB from "../../../public/images/letter-b.png";
+import LetterO from "../../../public/images/letter-o.png";
+import LetterS from "../../../public/images/letter-s.png";
+import Button from "../../components/Button";
+import { useAuth } from "../../contexts/AuthContext";
 
 const HeaderLayout = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme } = useTheme();
+  const { user, signOutData } = useAuth();
+
+  const getHeaderStyles = () => {
+    return {
+      borderBottom:
+        theme === "light"
+          ? "1px solid var(--mauve-3)"
+          : "1px solid var(--mauve-dark-6)",
+      backdropFilter: "blur(10px)",
+      color: theme === "light" ? "var(--mauve-10)" : "var(--mauve-4)",
+    };
+  };
 
   return (
-    <div className="md:py-4 py-2">
-      <div
-        className={`flex items-center justify-between rounded-[10px] px-4 py-3 flex-wrap gap-5 ${
-          theme === "light" ? "bg-white text-black" : "bg-[#001529] text-white"
-        }`}
-      >
-        <div className="flex items-center gap-5 flex-wrap">
-          <Switch
-            checkedChildren={<MoonFilled />}
-            unCheckedChildren={<SunFilled />}
-            checked={theme === "light" ? false : true}
-            onChange={toggleTheme}
+    <div
+      className={`flex items-center justify-between p-2 flex-wrap gap-5`}
+      style={getHeaderStyles()}
+    >
+      <div className="flex items-center gap-5 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
+            <img
+              src={Square}
+              alt="Square"
+              className="w-[35px] h-[35px] md:mr-2 mr-0"
+            />
+            <img
+              src={LetterC}
+              alt="Letter C"
+              className="w-[20px] h-[20px] md:block hidden"
+            />
+            <img
+              src={LetterU}
+              alt="Letter U"
+              className="w-[20px] h-[20px] md:block hidden"
+            />
+            <img
+              src={LetterB}
+              alt="Letter B"
+              className="w-[20px] h-[20px] md:block hidden"
+            />
+            <img
+              src={LetterO}
+              alt="Letter O"
+              className="w-[20px] h-[20px] md:block hidden"
+            />
+            <img
+              src={LetterS}
+              alt="Letter S"
+              className="w-[20px] h-[20px] md:block hidden"
+            />
+          </div>
+          <p
+            className="text-[20px] font-bold"
             style={{
-              backgroundColor: theme === "light" ? "#FFD700" : "#001f3f",
+              color: "var(--mauve-2)",
             }}
-          />
+          >
+            Movies
+          </p>
         </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Button variant="secondary" onClick={toggleTheme}>
+          {theme === "light" ? <MoonFilled /> : <SunFilled />}
+        </Button>
+
+        {user && (
+          <Button variant="primary" onClick={() => signOutData()}>
+            Logout
+          </Button>
+        )}
       </div>
     </div>
   );

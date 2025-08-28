@@ -1,1 +1,117 @@
-/* Add custom CSS */
+/* Estilos para o modal de filtros */
+.filters-modal .ant-modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.filters-modal .ant-modal-header {
+  padding: 20px 24px;
+  margin: 0;
+}
+
+.filters-modal .ant-modal-body {
+  padding: 24px;
+}
+
+.filters-modal .ant-modal-close {
+  top: 20px;
+  right: 20px;
+  color: inherit;
+}
+
+.filters-modal .ant-modal-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* Estilos para os labels */
+.filters-modal label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Estilos para os campos de duração */
+.filters-modal .duration-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.filters-modal .duration-labels span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Estilos para os botões */
+.filters-modal .ant-btn {
+  height: 36px;
+  padding: 0 16px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.filters-modal .ant-btn-primary {
+  background-color: var(--purple-9);
+  border-color: var(--purple-9);
+  color: var(--purple-1);
+}
+
+.filters-modal .ant-btn-primary:hover {
+  background-color: var(--purple-10);
+  border-color: var(--purple-10);
+}
+
+.filters-modal .ant-btn-secondary {
+  background-color: var(--mauve-4);
+  border-color: var(--mauve-4);
+  color: var(--mauve-11);
+}
+
+.filters-modal .ant-btn-secondary:hover {
+  background-color: var(--mauve-5);
+  border-color: var(--mauve-5);
+}
+
+/* Estilos para o footer dos botões */
+.filters-modal .filters-footer {
+  border-top: 1px solid;
+  padding-top: 20px;
+  margin-top: 24px;
+}
+
+/* Estilos para remover container preto do Select */
+:where(.css-dev-only-do-not-override-1endim9).ant-select-outlined:not(
+    .ant-select-customize-input
+  )
+  .ant-select-selector {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* CSS global para sobrescrever qualquer ant-select-selector */
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  background: transparent !important;
+  border: none !important;
+}
+
+.ant-select .ant-select-selector {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  .filters-modal .ant-modal {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .filters-modal .ant-modal-body {
+    padding: 16px;
+  }
+
+  .filters-modal .ant-modal-header {
+    padding: 16px;
+  }
+}

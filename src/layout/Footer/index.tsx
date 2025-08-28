@@ -6,13 +6,23 @@ const FooterLayout = () => {
   const { theme } = useContext(ThemeContext);
   const actualYear = new Date().getFullYear();
 
+  const getFooterStyles = () => {
+    return {
+      // backgroundColor: "var(--mauve-dark-1)",
+      borderTop:
+        theme === "light"
+          ? "1px solid var(--mauve-3)"
+          : "1px solid var(--mauve-dark-6)",
+      backdropFilter: "blur(10px)",
+    };
+  };
+
   return (
-    <Layout.Footer
-      className={`text-center md:my-4 my-2 rounded-[10px] ${
-        theme === "light" ? "bg-white text-black" : "bg-[#001529] text-white"
-      }`}
-    >
-      <p>Cubos Tecnologia / Thiago Cainelli - {actualYear}</p>
+    <Layout.Footer className={`text-center p-[16px]`} style={getFooterStyles()}>
+      <p className="font-thin">
+        {actualYear} © Todos os direitos reservados a{" "}
+        <span className="font-bold">Cubos Movies</span>
+      </p>
     </Layout.Footer>
   );
 };

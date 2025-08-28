@@ -3,6 +3,12 @@ type AuthLoginDto = {
   password: string;
 };
 
+type AuthRegisterDto = {
+  email: string;
+  password: string;
+  name: string;
+};
+
 type AuthForgotPasswordDto = {
   email: string;
 };
@@ -13,8 +19,8 @@ type AuthResetPasswordDto = {
 };
 
 type VerifyAuthDto = {
-  accessToken: string;
-  userData: ReadUserDto;
+  token: string;
+  usersData: ReadUserDto;
 };
 
 type SuccessAuthDto = {

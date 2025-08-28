@@ -6,6 +6,7 @@ type ReadFileDto = {
   originalname: string;
   mimetype: string;
   file: string;
+  url: string;
   createdAt: Date;
   updatedAt: Date;
 };

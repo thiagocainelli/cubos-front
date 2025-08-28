@@ -1,11 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import { ConfigProvider, Layout, theme as antdTheme } from "antd";
 import HeaderLayout from "./Header";
 import FooterLayout from "./Footer";
-import { ThemeContext } from "../contexts/ThemeContext";
+import { useTheme } from "../contexts/ThemeContext";
+import background from "../../public/images/background.png";
 
 const LayoutBase = ({ children }: { children: React.ReactNode }) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useTheme();
 
   return (
     <ConfigProvider
@@ -16,31 +17,38 @@ const LayoutBase = ({ children }: { children: React.ReactNode }) => {
             : antdTheme.darkAlgorithm,
       }}
     >
-      <main
-        className={`w-full flex min-h-screen overflow-x-hidden ${
-          theme === "light" ? "bg-white text-black" : "bg-[#001529] text-white"
-        }`}
+      <Layout
+        className={`flex flex-1 flex-col overflow-auto min-h-screen`}
+        style={{
+          backgroundImage: `url(${background})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+        }}
       >
-        <Layout
-          className={`md:px-4 px-2 flex flex-1 flex-col overflow-auto" ${
-            theme === "light" ? "bg-gray-200" : "bg-gray-700"
-          } `}
-        >
-          <HeaderLayout />
+        <HeaderLayout />
 
-          <Layout.Content
-            className={`flex-1 md:p-7 p-2 overflow-auto rounded-md ${
-              theme === "light"
-                ? "bg-white text-black"
-                : "bg-[#001529] text-white"
-            }`}
-          >
-            {children}
-          </Layout.Content>
+        <Layout.Content className={`flex-1 flex relative`}>
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(
+                  to bottom,
+                  rgba(0, 0, 0, 0.5) 0%,
+                  rgba(0, 0, 0, 0.7) 30%,
+                  rgba(0, 0, 0, 0.9) 60%,
+                  rgba(0, 0, 0, 1) 100%
+                )`,
+            }}
+          />
 
-          <FooterLayout />
-        </Layout>
-      </main>
+          {/* Conteúdo com z-index para ficar sobre o gradiente */}
+          <div className="relative z-10 flex-1 flex md:p-7 p-3">{children}</div>
+        </Layout.Content>
+
+        <FooterLayout />
+      </Layout>
     </ConfigProvider>
   );
 };
