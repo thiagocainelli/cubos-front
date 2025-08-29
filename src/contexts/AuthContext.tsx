@@ -21,6 +21,7 @@ type AuthContextData = {
   user: ReadUsersDto | undefined;
   controllerAtt: boolean;
   setControllerAtt: (value: boolean) => void;
+  getUserInfos: () => Promise<void>;
 };
 
 export const AuthContext = createContext({} as AuthContextData);
@@ -116,6 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user,
         controllerAtt,
         setControllerAtt,
+        getUserInfos,
       }}
     >
       {children}
