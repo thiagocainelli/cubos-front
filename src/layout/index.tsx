@@ -20,7 +20,6 @@ const LayoutBase = ({ children }: { children: React.ReactNode }) => {
       <Layout
         className={`flex flex-1 flex-col overflow-auto min-h-screen relative`}
       >
-        {/* Fundo com filtro grayscale */}
         <div
           className="absolute inset-0 z-0"
           style={{
@@ -49,8 +48,7 @@ const LayoutBase = ({ children }: { children: React.ReactNode }) => {
             }}
           />
 
-          {/* Conteúdo com z-index para ficar sobre o gradiente */}
-          <div className="relative z-10 flex-1 flex max-w-7xl mx-auto md:p-7 p-3">
+          <div className="relative z-10 flex-1 flex mx-auto md:p-5 p-2">
             {children}
           </div>
         </Layout.Content>

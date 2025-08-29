@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { notification } from "antd";
 import queryString from "query-string";
 
 import LayoutBase from "../../layout";
@@ -11,17 +10,25 @@ import {
   MovieTrailer,
   MovieDrawer,
   Button,
+  DeleteConfirmModal,
 } from "../../components";
 import { useTheme } from "../../contexts/ThemeContext";
-import CardInfo from "../../components/CardInfo";
+import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
+import Text from "../../components/Text";
 
 const MovieDetailsPage = () => {
   const { uuid } = queryString.parse(window.location.search);
   const navigate = useNavigate();
+
   const { theme } = useTheme();
+  const { user } = useAuth();
+  const { showSuccess, showError } = useToast();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("edit");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { fetchMovieByUuid, movieDetails, deleteMovie } = useMovies();
 
   useEffect(() => {
@@ -35,22 +42,26 @@ const MovieDetailsPage = () => {
     setDrawerOpen(true);
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     try {
-      if (await deleteMovie(uuid as string)) {
-        notification.success({
-          message: "Filme excluído com sucesso!",
-          placement: "bottomRight",
-        });
-        navigate("/movies");
-      }
+      setDeleteLoading(true);
+      await deleteMovie(uuid as string);
+      showSuccess("Filme excluído com sucesso!");
+      navigate("/movies");
     } catch (error) {
-      notification.error({
-        message: "Erro ao excluir filme",
-        description: "Tente novamente mais tarde.",
-        placement: "bottomRight",
-      });
+      showError("Erro ao excluir filme. Tente novamente mais tarde.");
+    } finally {
+      setDeleteLoading(false);
+      setDeleteModalOpen(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
   };
 
   const handleDrawerClose = () => {
@@ -58,7 +69,6 @@ const MovieDetailsPage = () => {
   };
 
   const handleDrawerSuccess = () => {
-    // Recarregar os dados do filme
     if (uuid) {
       fetchMovieByUuid(uuid as string);
     }
@@ -81,12 +91,12 @@ const MovieDetailsPage = () => {
   return (
     <LayoutBase>
       <div className="absolute inset-0 z-0" />
-      <div className="relative z-10 flex-1 flex max-w-7xl mx-auto">
+      <div className="relative z-10 flex-1 flex  mx-auto">
         <div
           className="w-full rounded-[4px]"
           style={{
             backgroundColor:
-              theme === "light" ? "rgba(255, 255, 255, 0.7)" : "#121113",
+              theme === "light" ? "rgba(255, 255, 255, 0.9)" : "#121113",
           }}
         >
           <div
@@ -110,38 +120,58 @@ const MovieDetailsPage = () => {
               <MoviePoster movie={movieDetails} />
             </div>
 
-            <div className="md:hidden space-x-3 grid grid-cols-12 col-span-12">
-              <Button
-                className="col-span-4"
-                variant="secondary"
-                onClick={handleDelete}
-              >
-                Deletar
-              </Button>
-              <Button
-                className="col-span-8"
-                variant="primary"
-                onClick={handleEdit}
-              >
-                Editar
-              </Button>
+            {user?.uuid === movieDetails?.userUuid && (
+              <div className="md:hidden space-x-3 grid grid-cols-12 col-span-12">
+                <Button
+                  className="col-span-4"
+                  variant="secondary"
+                  onClick={handleDeleteClick}
+                >
+                  Deletar
+                </Button>
+                <Button
+                  className="col-span-8"
+                  variant="primary"
+                  onClick={handleEdit}
+                >
+                  Editar
+                </Button>
+              </div>
+            )}
+
+            <div className="flex md:hidden flex-col  justify-center items-center col-span-12 lg:col-span-4">
+              <Text size="xlarge" weight="bold">
+                {movieDetails?.title}
+              </Text>
+              <Text size="medium">
+                Título Original: {movieDetails?.originalTitle}
+              </Text>
             </div>
 
-            {/* Coluna direita - Informações */}
             <div className="col-span-12 lg:col-span-4">
               <MovieInfo
                 movie={movieDetails}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={handleDeleteConfirm}
               />
             </div>
           </div>
 
-          <div className="mt-12 lg:mt-16 p-[24px]">
+          <div className="mt-4 p-[24px]">
             <MovieTrailer trailerUrl={movieDetails?.trailerUrl} />
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmação de exclusão */}
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        loading={deleteLoading}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja deletar este filme?"
+      />
 
       {drawerOpen && (
         <MovieDrawer

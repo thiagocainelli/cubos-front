@@ -39,8 +39,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [controllerAtt, setControllerAtt] = useState(false);
   const { "auth.token.cubos": token } = parseCookies();
 
-  console.log("token", token);
-
   const getUserInfos = async () => {
     try {
       const response: ReadUsersDto | undefined = await verifyToken();
@@ -67,7 +65,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!response) return false;
       const { token, usersData } = response;
 
-      // Set cookie first
       setCookie(undefined, "auth.token.cubos", token, {
         maxAge: 60 * 60 * 24 * 30,
         path: "/",

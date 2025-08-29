@@ -1,14 +1,9 @@
 import Text from "../Text";
-import { useTheme } from "../../contexts/ThemeContext";
-
 interface MovieTrailerProps {
   trailerUrl?: string;
 }
 
 const MovieTrailer = ({ trailerUrl }: MovieTrailerProps) => {
-  const { theme } = useTheme();
-
-  // Função para extrair o ID do vídeo do YouTube
   const getYouTubeVideoId = (url: string) => {
     if (!url) return null;
 
@@ -20,9 +15,6 @@ const MovieTrailer = ({ trailerUrl }: MovieTrailerProps) => {
   };
 
   const videoId = trailerUrl ? getYouTubeVideoId(trailerUrl) : null;
-
-  console.log({ trailerUrl });
-  console.log({ videoId });
 
   if (!videoId) {
     return (

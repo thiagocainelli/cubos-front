@@ -30,7 +30,7 @@ type ReadMovieDto = {
   title: string;
   originalTitle: string;
   language: string;
-  situation: MovieSituation;
+  situation: string;
   synopsis: string;
   popularity: number;
   votesQuantity: number;

@@ -2,9 +2,9 @@ import { Button, Drawer } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import MovieForm from "../forms/MovieForm";
 import { createMovie, updateMovie } from "../../services/movies.service";
-import { notification } from "antd";
 import { useState } from "react";
 import Text from "../Text";
+import { useToast } from "../../contexts/ToastContext";
 
 interface MovieDrawerProps {
   open: boolean;
@@ -22,6 +22,7 @@ const MovieDrawer = ({
   onSuccess,
 }: MovieDrawerProps) => {
   const [loading, setLoading] = useState(false);
+  const { showSuccess, showError } = useToast();
 
   const handleSubmit = async (values: any) => {
     try {
@@ -30,31 +31,26 @@ const MovieDrawer = ({
       if (mode === "create") {
         await createMovie(values);
       } else {
-        // Para edição, precisamos do UUID do filme
         if (initialValues?.uuid) {
-          const { uuid, ...rest } = initialValues;
-          await updateMovie({ ...rest, uuid });
+          await updateMovie(initialValues.uuid, values);
         } else {
           throw new Error("UUID do filme não encontrado para edição");
         }
       }
 
-      notification.success({
-        message: `Filme ${
-          mode === "create" ? "criado" : "atualizado"
-        } com sucesso!`,
-        placement: "bottomRight",
-      });
+      showSuccess(
+        `Filme ${mode === "create" ? "criado" : "atualizado"} com sucesso!`
+      );
 
       onSuccess?.();
       onClose();
     } catch (error) {
       console.error("Erro ao salvar filme:", error);
-      notification.error({
-        message: `Erro ao ${mode === "create" ? "criar" : "atualizar"} filme`,
-        description: "Tente novamente mais tarde.",
-        placement: "bottomRight",
-      });
+      showError(
+        `Erro ao ${
+          mode === "create" ? "criar" : "atualizar"
+        } filme. Tente novamente mais tarde.`
+      );
     } finally {
       setLoading(false);
     }
@@ -73,7 +69,7 @@ const MovieDrawer = ({
       onClose={onClose}
     >
       <div className="flex items-center justify-between mb-3">
-        <Text size="large">{getTitle()}</Text>
+        <Text size="xlarge">{getTitle()}</Text>
         <Button type="text" onClick={onClose}>
           <CloseOutlined />
         </Button>

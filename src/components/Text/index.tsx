@@ -18,7 +18,7 @@ const Text = ({
 
   const getTextStyles = () => {
     return {
-      color: theme === "light" ? "var(--mauve-10)" : "var(--mauve-4)",
+      color: theme === "light" ? "var(--mauve-10)" : "var(--mauve-1)",
       fontSize:
         size === "small"
           ? "12px"

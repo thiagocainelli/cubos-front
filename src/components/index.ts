@@ -9,6 +9,9 @@ export { default as MovieInfo } from "./MovieInfo";
 export { default as MovieTrailer } from "./MovieTrailer";
 export { default as Pagination } from "./Pagination";
 export { default as FiltersModal } from "./FiltersModal";
+export { default as Toast } from "./Toast";
+export { default as DeleteConfirmModal } from "./DeleteConfirmModal";
+export { default as CurrencyInput } from "./CurrencyInput";
 
 // Forms
 export { default as LoginForm } from "./forms/LoginForm";

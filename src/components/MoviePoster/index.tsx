@@ -1,13 +1,29 @@
+import { useNavigate } from "react-router-dom";
+import Button from "../Button";
 import CardInfo from "../CardInfo";
 import Text from "../Text";
+import { ArrowLeft } from "lucide-react";
 
 interface MoviePosterProps {
-  movie: any;
+  movie: ReadMovieDto;
 }
 
 const MoviePoster = ({ movie }: MoviePosterProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col items-center lg:items-start space-y-4">
+      <div className="w-full md:w-auto flex">
+        <Button
+          variant="secondary"
+          onClick={() => navigate("/movies")}
+          className="flex items-center justify-center gap-2 w-full"
+        >
+          <ArrowLeft size={16} />
+          Voltar para Filmes
+        </Button>
+      </div>
+
       <div className=" flex-col gap-1 md:flex hidden">
         {/* Título principal */}
         <Text size="xlarge" weight="bold">

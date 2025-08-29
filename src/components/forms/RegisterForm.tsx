@@ -1,5 +1,5 @@
 import React from "react";
-import { Form as AntForm, notification } from "antd";
+import { Form as AntForm } from "antd";
 import { useNavigate } from "react-router-dom";
 
 import { register } from "../../services/auth.service";
@@ -7,6 +7,7 @@ import Form from "../Form";
 import Input from "../Input";
 import Button from "../Button";
 import Link from "../Link";
+import { useToast } from "../../contexts/ToastContext";
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -21,6 +22,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState<boolean>(false);
 
+  const { showSuccess, showError } = useToast();
+
   const handleRegister = async () => {
     try {
       setLoading(true);
@@ -28,37 +31,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       const name = form.getFieldValue("name");
       const email = form.getFieldValue("email");
       const password = form.getFieldValue("password");
-      const confirmPassword = form.getFieldValue("confirmPassword");
 
       if (!name || !email || !password) {
-        notification.error({
-          message: "Por favor, preencha todos os campos.",
-          placement: "bottomRight",
-        });
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        notification.error({
-          message: "As senhas não coincidem.",
-          placement: "bottomRight",
-        });
-        return;
-      }
-
-      if (password.length < 6) {
-        notification.error({
-          message: "Senha deve ter pelo menos 6 caracteres.",
-          placement: "bottomRight",
-        });
-        return;
-      }
-
-      if (password.length > 128) {
-        notification.error({
-          message: "Senha deve ter no máximo 128 caracteres.",
-          placement: "bottomRight",
-        });
+        showError("Por favor, preencha todos os campos.");
         return;
       }
 
@@ -68,26 +43,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         password,
       };
 
-      console.log("registerData", registerData);
-
       const response = await register(registerData);
 
       if (response) {
-        notification.success({
-          message: "Conta criada com sucesso!",
-          placement: "bottomRight",
-        });
+        showSuccess("Conta criada com sucesso!");
 
         onSuccess?.();
         navigate(redirectTo);
       }
     } catch (error) {
       console.error(error);
-
-      notification.error({
-        message: "Falha ao criar conta. Por favor, tente novamente.",
-        placement: "bottomRight",
-      });
+      showError("Falha ao criar conta. Por favor, tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -165,7 +131,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         <Button
           variant="primary"
           type="submit"
-          onClick={() => form.submit()}
+          // onClick={() => form.submit()}
           loading={loading}
           className="w-full"
         >

@@ -28,6 +28,7 @@ const MoviesPage = () => {
     searchMovies,
     filterBySituation,
     filterByGenre,
+    filterByDuration,
     resetFilters,
     fetchMovies,
     currentPage,
@@ -50,7 +51,6 @@ const MoviesPage = () => {
   const handleApplyFilters = (filters: any) => {
     setCurrentFilters(filters);
 
-    // Aplicar filtros usando o hook
     if (filters.genre) {
       filterByGenre(filters.genre);
     }
@@ -58,10 +58,13 @@ const MoviesPage = () => {
       filterBySituation(filters.situation);
     }
 
-    // TODO: Implementar filtro de duração no hook useMovies
-    console.log("Filtros aplicados:", filters);
+    if (filters.durationMin && filters.durationMax) {
+      filterByDuration(
+        Number(filters.durationMin),
+        Number(filters.durationMax)
+      );
+    }
 
-    // Fechar modal e resetar página
     setFiltersModalOpen(false);
     setPage(1);
   };
@@ -88,7 +91,6 @@ const MoviesPage = () => {
   };
 
   const handleDrawerSuccess = () => {
-    // Recarregar a lista de filmes após criar/editar
     fetchMovies();
   };
 
@@ -96,14 +98,12 @@ const MoviesPage = () => {
     setPage(page);
   };
 
-  // Calcular total de páginas
   const totalPages = Math.ceil(totalMovies / itemsPerPage);
 
   return (
     <LayoutBase>
-      <div className="flex-1 flex max-w-7xl">
+      <div className="flex-1 flex ">
         <div className="w-full rounded-[4px]">
-          {/* Header com busca e ações */}
           <div className="flex md:flex-row flex-col md:items-center md:justify-end gap-4 mb-8">
             <Input
               placeholder="Buscar filmes..."
@@ -122,14 +122,12 @@ const MoviesPage = () => {
             </Button>
           </div>
 
-          {/* Lista de filmes */}
           <div
             className={`p-[24px] ${
               theme === "light" ? "bg-[#ffff]/50" : "bg-[#EBEAF814]"
             } rounded-[4px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6`}
           >
             {loading ? (
-              // Loading state
               Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="animate-pulse">
                   <div
@@ -150,7 +148,6 @@ const MoviesPage = () => {
                 </div>
               ))
             ) : movies.length > 0 ? (
-              // Movies list
               movies.map((movie) => (
                 <MoviesCard
                   key={movie.uuid}
@@ -159,7 +156,6 @@ const MoviesPage = () => {
                 />
               ))
             ) : (
-              // Empty state
               <div className="col-span-full text-center py-12">
                 <Text size="large">
                   {searchQuery
@@ -175,7 +171,6 @@ const MoviesPage = () => {
             )}
           </div>
 
-          {/* Error state */}
           {error && (
             <div className="text-center py-8">
               <div className="text-red-500 text-lg mb-2">
@@ -185,7 +180,6 @@ const MoviesPage = () => {
             </div>
           )}
 
-          {/* Paginação */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -195,7 +189,6 @@ const MoviesPage = () => {
         </div>
       </div>
 
-      {/* Movie Drawer */}
       <MovieDrawer
         open={drawerOpen}
         onClose={handleDrawerClose}
@@ -204,7 +197,6 @@ const MoviesPage = () => {
         onSuccess={handleDrawerSuccess}
       />
 
-      {/* Filters Modal */}
       <FiltersModal
         open={filtersModalOpen}
         onClose={handleFiltersClose}

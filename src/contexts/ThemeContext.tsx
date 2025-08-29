@@ -29,7 +29,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
     if (theme === "light") {
       document.documentElement.classList.remove("dark");
-      // Aplicar cores do tema claro
       document.documentElement.style.setProperty(
         "--current-background",
         "var(--mauve-1)"
@@ -44,7 +43,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       );
     } else {
       document.documentElement.classList.add("dark");
-      // Aplicar cores do tema escuro
       document.documentElement.style.setProperty(
         "--current-background",
         "var(--mauve-dark-1)"

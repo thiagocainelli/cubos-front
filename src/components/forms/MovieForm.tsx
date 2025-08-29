@@ -1,49 +1,22 @@
 import { useEffect, useState } from "react";
-import { Form as AntForm, notification, Upload } from "antd";
+import { Form as AntForm, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import type { UploadFile, UploadProps } from "antd/es/upload/interface";
+import dayjs from "dayjs";
 import Input from "../Input";
 import Select from "../Select";
 import TextArea from "../TextArea";
 import Button from "../Button";
 import DatePicker from "../DatePicker";
-import { uploadFile } from "../../services/storage.service";
+import CurrencyInput from "../CurrencyInput";
+import { deleteFile, uploadFile } from "../../services/storage.service";
 import { useAuth } from "../../contexts/AuthContext";
-import dayjs, { Dayjs } from "dayjs";
-
-const movieLanguages = [
-  { label: "Português (Brasil)", value: "pt-BR" },
-  { label: "Inglês (EUA)", value: "en-US" },
-  { label: "Espanhol", value: "es-ES" },
-  { label: "Francês", value: "fr-FR" },
-  { label: "Alemão", value: "de-DE" },
-];
-
-const movieSituations = [
-  { label: "Em breve", value: "upcoming" },
-  { label: "Lançado", value: "released" },
-  { label: "Cancelado", value: "canceled" },
-];
-
-const movieGenres = [
-  { label: "Ação", value: "Ação" },
-  { label: "Aventura", value: "Aventura" },
-  { label: "Comédia", value: "Comédia" },
-  { label: "Drama", value: "Drama" },
-  { label: "Ficção Científica", value: "Ficção Científica" },
-  { label: "Terror", value: "Terror" },
-  { label: "Suspense", value: "Suspense" },
-  { label: "Romance", value: "Romance" },
-  { label: "Documentário", value: "Documentário" },
-  { label: "Animação", value: "Animação" },
-  { label: "Biografia", value: "Biografia" },
-  { label: "Guerra", value: "Guerra" },
-  { label: "Musical", value: "Musical" },
-  { label: "Faroeste", value: "Faroeste" },
-  { label: "Mistério", value: "Mistério" },
-  { label: "Policial", value: "Policial" },
-  { label: "Outro", value: "Outro" },
-];
+import { useToast } from "../../contexts/ToastContext";
+import {
+  movieLanguages,
+  movieSituations,
+  movieGenres,
+} from "../../constants/Movies/constants";
 
 interface MovieFormProps {
   initialValues?: any;
@@ -59,6 +32,7 @@ const MovieForm = ({
   mode,
 }: MovieFormProps) => {
   const { user } = useAuth();
+  const { showSuccess, showError } = useToast();
   const [form] = AntForm.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -66,16 +40,18 @@ const MovieForm = ({
     try {
       let fileUuid: string | undefined;
       let fileUrl: string | undefined;
+
       if (fileList && fileList.length > 0) {
         const file = fileList[0];
-        const formData = new FormData();
-        formData.append("file", file.originFileObj as any);
-        const resp = await uploadFile(formData);
-        fileUuid = resp.uuid;
-        fileUrl = resp.url;
+        if (file.originFileObj) {
+          const formData = new FormData();
+          formData.append("file", file.originFileObj as any);
+          const resp = await uploadFile(formData);
+          fileUuid = resp.uuid;
+          fileUrl = resp.url;
+        }
       }
 
-      // Processar valores antes de enviar
       const processedValues = {
         title: values.title,
         originalTitle: values.originalTitle,
@@ -90,9 +66,12 @@ const MovieForm = ({
         durationInMinutes: values.durationInMinutes
           ? Number(values.durationInMinutes)
           : undefined,
-        budget: values.budget ? Number(values.budget) : undefined,
-        revenue: values.revenue ? Number(values.revenue) : undefined,
+        budget: values.budget ? Math.round(Number(values.budget)) : undefined,
+        revenue: values.revenue
+          ? Math.round(Number(values.revenue))
+          : undefined,
         popularity: values.popularity ? Number(values.popularity) : undefined,
+        profit: values.profit ? Math.round(Number(values.profit)) : undefined,
         votesQuantity: values.votesQuantity
           ? Number(values.votesQuantity)
           : undefined,
@@ -104,21 +83,18 @@ const MovieForm = ({
 
       await onSubmit(processedValues);
 
-      notification.success({
-        message: `Filme ${
-          mode === "create" ? "criado" : "atualizado"
-        } com sucesso!`,
-        placement: "bottomRight",
-      });
+      showSuccess(
+        `Filme ${mode === "create" ? "criado" : "atualizado"} com sucesso!`
+      );
 
       form.resetFields();
       setFileList([]);
     } catch (error) {
-      notification.error({
-        message: `Erro ao ${mode === "create" ? "criar" : "atualizar"} filme`,
-        description: "Tente novamente mais tarde.",
-        placement: "bottomRight",
-      });
+      showError(
+        `Erro ao ${
+          mode === "create" ? "criar" : "atualizar"
+        } filme. Tente novamente mais tarde.`
+      );
     }
   };
 
@@ -127,38 +103,70 @@ const MovieForm = ({
     beforeUpload: (file) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
-        notification.error({
-          message: "Você só pode fazer upload de arquivos de imagem!",
-          placement: "bottomRight",
-        });
+        showError("Você só pode fazer upload de arquivos de imagem!");
         return false;
       }
-
-      const isLt2M = file.size! / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        notification.error({
-          message: "A imagem deve ser menor que 2MB!",
-          placement: "bottomRight",
-        });
-        return false;
-      }
-
-      return false; // Não fazer upload automático
+      return false;
     },
     maxCount: 1,
     accept: "image/*",
     onChange: ({ fileList: newFileList }) => {
       setFileList(newFileList);
     },
+    async onRemove(file) {
+      if (file && file.uid) {
+        await deleteFile(file.uid);
+
+        setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+      }
+    },
+    listType: "picture",
   };
 
   useEffect(() => {
-    if (initialValues) {
-      const { releaseDate, ...rest } = initialValues;
-      form.setFieldsValue({
-        ...rest,
+    if (initialValues && form) {
+      const {
         releaseDate,
-      });
+        posterUrl,
+        posterUuid,
+        budget,
+        revenue,
+        profit,
+        ...rest
+      } = initialValues;
+
+      if (posterUrl && posterUuid) {
+        setFileList([
+          {
+            uid: posterUuid,
+            name: "image.png",
+            status: "done",
+            url: posterUrl,
+          },
+        ]);
+      }
+
+      let processedReleaseDate = releaseDate;
+      if (releaseDate && typeof releaseDate === "string") {
+        try {
+          const dayjsDate = dayjs(releaseDate);
+          processedReleaseDate = dayjsDate.isValid() ? dayjsDate : undefined;
+        } catch (error) {
+          console.warn("Erro ao converter data:", error);
+          processedReleaseDate = undefined;
+        }
+      }
+
+      // Usar setTimeout para garantir que o formulário esteja pronto
+      setTimeout(() => {
+        form.setFieldsValue({
+          ...rest,
+          releaseDate: processedReleaseDate,
+          budget: budget,
+          revenue: revenue,
+          profit: profit,
+        });
+      }, 100);
     }
   }, [initialValues, form]);
 
@@ -169,7 +177,6 @@ const MovieForm = ({
       onFinish={handleSubmit}
       className="space-y-4"
     >
-      {/* Título e Título Original */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AntForm.Item
           name="title"
@@ -254,57 +261,47 @@ const MovieForm = ({
         <AntForm.Item
           name="durationInMinutes"
           label="Duração (minutos)"
-          rules={[{ required: true, message: "Por favor, insira a duração" }]}
+          rules={[
+            {
+              required: true,
+              message: "Por favor, insira a duração do filme",
+            },
+          ]}
         >
           <Input
             size="small"
             type="number"
             placeholder="Ex: 150"
             min={1}
-            max={500}
+            max={999}
           />
         </AntForm.Item>
       </div>
-      {/* Orçamento e Receita */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Orçamento, Receita e Lucro */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <AntForm.Item name="budget" label="Orçamento (USD)">
-          <Input
-            size="small"
-            type="number"
-            placeholder="Ex: 300000000"
-            min={0}
-          />
+          <CurrencyInput size="small" placeholder="Ex: 1.000.000" />
         </AntForm.Item>
 
         <AntForm.Item name="revenue" label="Receita (USD)">
-          <Input
+          <CurrencyInput size="small" placeholder="Ex: 2.000.000" />
+        </AntForm.Item>
+
+        <AntForm.Item name="profit" label="Lucro (USD)">
+          <CurrencyInput
             size="small"
-            type="number"
-            placeholder="Ex: 2797800564"
-            min={0}
+            placeholder="Ex: 1.000.000"
+            allowNegative={true}
           />
         </AntForm.Item>
       </div>
-      <AntForm.Item name="trailerUrl" label="URL do Trailer">
-        <Input
-          size="small"
-          placeholder="Ex: https://www.youtube.com/watch?v=..."
-        />
-      </AntForm.Item>
-      <AntForm.Item name="poster" label="Poster do Filme" className="w-full">
-        <Upload {...uploadProps} listType="picture-card" className="w-full">
-          <div className="w-full">
-            <UploadOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-          </div>
-        </Upload>
-      </AntForm.Item>
+      {/* Popularidade, Votos e Rating */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <AntForm.Item name="popularity" label="Popularidade">
           <Input
             size="small"
             type="number"
-            placeholder="0-100"
+            placeholder="Ex: 85"
             min={0}
             max={100}
           />
@@ -314,26 +311,46 @@ const MovieForm = ({
           <Input size="small" type="number" placeholder="Ex: 1000" min={0} />
         </AntForm.Item>
 
-        <AntForm.Item name="ratingPercentage" label="Avaliação (%)">
+        <AntForm.Item name="ratingPercentage" label="Rating (%)">
           <Input
             size="small"
             type="number"
-            placeholder="0-100"
+            placeholder="Ex: 92"
             min={0}
             max={100}
           />
         </AntForm.Item>
       </div>
-      {/* Botões de ação */}
-      <div className="flex justify-end gap-3 py-5">
+      {/* Trailer */}
+      <AntForm.Item name="trailerUrl" label="URL do Trailer">
+        <Input
+          size="small"
+          placeholder="Ex: https://www.youtube.com/watch?v=..."
+        />
+      </AntForm.Item>
+      {/* Upload do Poster */}
+      <AntForm.Item label="Poster do Filme">
+        <Upload {...uploadProps}>
+          <Button
+            variant="secondary"
+            className="flex items-center gap-2"
+            type="button"
+          >
+            <UploadOutlined />
+            Selecionar Poster
+          </Button>
+        </Upload>
+      </AntForm.Item>
+      {/* Botões de Ação */}
+      <div className="flex justify-end gap-3 pt-4 pb-5">
         <Button
-          isTextBlack
-          onClick={() => form.resetFields()}
           variant="secondary"
+          onClick={() => form.resetFields()}
+          type="button"
         >
           Limpar
         </Button>
-        <Button type="submit" loading={loading} variant="primary">
+        <Button variant="primary" type="submit" loading={loading}>
           {mode === "create" ? "Criar Filme" : "Atualizar Filme"}
         </Button>
       </div>

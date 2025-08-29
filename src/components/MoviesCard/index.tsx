@@ -26,7 +26,7 @@ const MoviesCard = ({ movie, onEdit }: MoviesCardProps) => {
         backgroundRepeat: "no-repeat",
         borderRadius: "4px",
       }}
-      className="relative cursor-pointer min-w-[300px] h-[400px] rounded-lg group overflow-hidden"
+      className="relative cursor-pointer h-[400px] rounded-lg group overflow-hidden"
       onClick={onEdit}
     >
       {/* Overlay escuro base */}

@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { notification } from "antd";
 import {
   createMovie,
   updateMovie,
@@ -7,47 +6,43 @@ import {
   getMoviesListAndSearch,
   deleteMovie,
 } from "../services/movies.service";
+import { useToast } from "../contexts/ToastContext";
 
 interface UseMoviesReturn {
-  // State
   movies: ReadMovieDto[];
   totalMovies: number;
   loading: boolean;
   error: string | null;
   movieDetails: ReadMovieDto | null;
-  // Pagination
+
   currentPage: number;
   itemsPerPage: number;
 
-  // Search and Filters
   searchQuery: string;
   selectedSituation: MovieSituation | undefined;
   selectedGenre: string | undefined;
 
-  // Actions
   fetchMovies: (page?: number, itemsPerPage?: number) => Promise<void>;
   fetchMovieByUuid: (uuid: string) => Promise<ReadMovieDto | null>;
   createMovie: (data: CreateMovieDto) => Promise<boolean>;
-  updateMovie: (data: UpdateMovieDto) => Promise<boolean>;
+  updateMovie: (uuid: string, data: UpdateMovieDto) => Promise<boolean>;
   deleteMovie: (uuid: string) => Promise<boolean>;
 
-  // Search and Filter
   searchMovies: (query: string) => void;
   filterBySituation: (situation: MovieSituation | undefined) => void;
   filterByGenre: (genre: string | undefined) => void;
-
-  // Pagination
+  filterByDuration: (startDuration: number, endDuration: number) => void;
   setPage: (page: number) => void;
   setItemsPerPage: (itemsPerPage: number) => void;
 
-  // Utils
   clearError: () => void;
   resetFilters: () => void;
 }
 
 const useMovies = (): UseMoviesReturn => {
-  // Consolidate related state into objects for better performance
-  const [state, setState] = useState({
+  const { showSuccess, showError } = useToast();
+
+  const [moviesState, setMoviesState] = useState({
     movies: [] as ReadMovieDto[],
     totalMovies: 0,
     loading: false,
@@ -65,6 +60,8 @@ const useMovies = (): UseMoviesReturn => {
     searchQuery: "",
     selectedSituation: undefined as MovieSituation | undefined,
     selectedGenre: undefined as string | undefined,
+    startDuration: undefined as number | undefined,
+    endDuration: undefined as number | undefined,
   });
 
   const apiParams = useMemo(
@@ -74,6 +71,8 @@ const useMovies = (): UseMoviesReturn => {
       search: filters.searchQuery || undefined,
       situation: filters.selectedSituation,
       genre: filters.selectedGenre,
+      startDuration: filters.startDuration,
+      endDuration: filters.endDuration,
     }),
     [
       pagination.currentPage,
@@ -81,13 +80,15 @@ const useMovies = (): UseMoviesReturn => {
       filters.searchQuery,
       filters.selectedSituation,
       filters.selectedGenre,
+      filters.startDuration,
+      filters.endDuration,
     ]
   );
 
   const fetchMovies = useCallback(
     async (page?: number, itemsPerPage?: number) => {
       try {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+        setMoviesState((prev) => ({ ...prev, loading: true, error: null }));
 
         const pageToUse = page || pagination.currentPage;
         const itemsPerPageToUse = itemsPerPage || pagination.itemsPerPage;
@@ -97,11 +98,13 @@ const useMovies = (): UseMoviesReturn => {
           itemsPerPageToUse,
           filters.searchQuery || undefined,
           filters.selectedSituation,
-          filters.selectedGenre
+          filters.selectedGenre,
+          filters.startDuration,
+          filters.endDuration
         );
 
         if (response && response.data) {
-          setState((prev) => ({
+          setMoviesState((prev) => ({
             ...prev,
             movies: response.data,
             totalMovies: response.total,
@@ -117,18 +120,17 @@ const useMovies = (): UseMoviesReturn => {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Erro ao buscar filmes";
-        setState((prev) => ({ ...prev, error: errorMessage, loading: false }));
-        notification.error({
-          message: "Erro",
-          description: errorMessage,
-          placement: "bottomRight",
-        });
+        setMoviesState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          loading: false,
+        }));
+        showError("Erro", errorMessage);
       }
     },
-    [apiParams]
+    [apiParams, showError]
   );
 
-  // Simple state setters - no need for useCallback
   const searchMovies = (query: string) => {
     setFilters((prev) => ({ ...prev, searchQuery: query }));
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
@@ -141,6 +143,11 @@ const useMovies = (): UseMoviesReturn => {
 
   const filterByGenre = (genre: string | undefined) => {
     setFilters((prev) => ({ ...prev, selectedGenre: genre }));
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+  };
+
+  const filterByDuration = (startDuration: number, endDuration: number) => {
+    setFilters((prev) => ({ ...prev, startDuration, endDuration }));
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
@@ -157,7 +164,7 @@ const useMovies = (): UseMoviesReturn => {
   };
 
   const clearError = () => {
-    setState((prev) => ({ ...prev, error: null }));
+    setMoviesState((prev) => ({ ...prev, error: null }));
   };
 
   const resetFilters = () => {
@@ -165,6 +172,8 @@ const useMovies = (): UseMoviesReturn => {
       searchQuery: "",
       selectedSituation: undefined,
       selectedGenre: undefined,
+      startDuration: undefined,
+      endDuration: undefined,
     });
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
@@ -172,16 +181,12 @@ const useMovies = (): UseMoviesReturn => {
   const createMovieHandler = useCallback(
     async (data: CreateMovieDto): Promise<boolean> => {
       try {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+        setMoviesState((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await createMovie(data);
 
         if (response) {
-          notification.success({
-            message: "Sucesso",
-            description: "Filme criado com sucesso!",
-            placement: "bottomRight",
-          });
+          showSuccess("Sucesso", "Filme criado com sucesso!");
 
           await fetchMovies();
           return true;
@@ -191,31 +196,27 @@ const useMovies = (): UseMoviesReturn => {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Erro ao criar filme";
-        setState((prev) => ({ ...prev, error: errorMessage, loading: false }));
-        notification.error({
-          message: "Erro",
-          description: errorMessage,
-          placement: "bottomRight",
-        });
+        setMoviesState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          loading: false,
+        }));
+        showError("Erro", errorMessage);
         return false;
       }
     },
-    [fetchMovies]
+    [fetchMovies, showSuccess, showError]
   );
 
   const updateMovieHandler = useCallback(
-    async (data: UpdateMovieDto): Promise<boolean> => {
+    async (uuid: string, data: UpdateMovieDto): Promise<boolean> => {
       try {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+        setMoviesState((prev) => ({ ...prev, loading: true, error: null }));
 
-        const response = await updateMovie(data);
+        const response = await updateMovie(uuid, data);
 
         if (response) {
-          notification.success({
-            message: "Sucesso",
-            description: "Filme atualizado com sucesso!",
-            placement: "bottomRight",
-          });
+          showSuccess("Sucesso", "Filme atualizado com sucesso!");
 
           await fetchMovies();
           return true;
@@ -225,31 +226,27 @@ const useMovies = (): UseMoviesReturn => {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Erro ao atualizar filme";
-        setState((prev) => ({ ...prev, error: errorMessage, loading: false }));
-        notification.error({
-          message: "Erro",
-          description: errorMessage,
-          placement: "bottomRight",
-        });
+        setMoviesState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          loading: false,
+        }));
+        showError("Erro", errorMessage);
         return false;
       }
     },
-    [fetchMovies]
+    [fetchMovies, showSuccess, showError]
   );
 
   const deleteMovieHandler = useCallback(
     async (uuid: string): Promise<boolean> => {
       try {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+        setMoviesState((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await deleteMovie(uuid);
 
         if (response !== undefined) {
-          notification.success({
-            message: "Sucesso",
-            description: "Filme excluído com sucesso!",
-            placement: "bottomRight",
-          });
+          showSuccess("Sucesso", "Filme excluído com sucesso!");
 
           await fetchMovies();
           return true;
@@ -259,27 +256,27 @@ const useMovies = (): UseMoviesReturn => {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Erro ao excluir filme";
-        setState((prev) => ({ ...prev, error: errorMessage, loading: false }));
-        notification.error({
-          message: "Erro",
-          description: errorMessage,
-          placement: "bottomRight",
-        });
+        setMoviesState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          loading: false,
+        }));
+        showError("Erro", errorMessage);
         return false;
       }
     },
-    [fetchMovies]
+    [fetchMovies, showSuccess, showError]
   );
 
   const fetchMovieByUuid = useCallback(
     async (uuid: string): Promise<ReadMovieDto | null> => {
       try {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+        setMoviesState((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await getMovieByUuid(uuid);
 
         if (response) {
-          setState((prev) => ({ ...prev, loading: false }));
+          setMoviesState((prev) => ({ ...prev, loading: false }));
           setMovieDetails(response);
           return response;
         } else {
@@ -288,56 +285,49 @@ const useMovies = (): UseMoviesReturn => {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Erro ao buscar filme";
-        setState((prev) => ({ ...prev, error: errorMessage, loading: false }));
-        notification.error({
-          message: "Erro",
-          description: errorMessage,
-          placement: "bottomRight",
-        });
+        setMoviesState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          loading: false,
+        }));
+        showError("Erro", errorMessage);
         return null;
       }
     },
-    []
+    [showError]
   );
 
-  // Fetch movies when filters change
   useEffect(() => {
     fetchMovies();
   }, [fetchMovies]);
 
   return {
-    // State
-    movies: state.movies,
-    totalMovies: state.totalMovies,
-    loading: state.loading,
-    error: state.error,
+    movies: moviesState.movies,
+    totalMovies: moviesState.totalMovies,
+    loading: moviesState.loading,
+    error: moviesState.error,
     movieDetails,
-    // Pagination
     currentPage: pagination.currentPage,
     itemsPerPage: pagination.itemsPerPage,
 
-    // Search and Filters
     searchQuery: filters.searchQuery,
     selectedSituation: filters.selectedSituation,
     selectedGenre: filters.selectedGenre,
 
-    // Actions
     fetchMovies,
     fetchMovieByUuid,
     createMovie: createMovieHandler,
     updateMovie: updateMovieHandler,
     deleteMovie: deleteMovieHandler,
 
-    // Search and Filter
     searchMovies,
     filterBySituation,
     filterByGenre,
+    filterByDuration,
 
-    // Pagination
     setPage,
     setItemsPerPage,
 
-    // Utils
     clearError,
     resetFilters,
   };

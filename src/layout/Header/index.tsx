@@ -10,6 +10,30 @@ import Button from "../../components/Button";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+const allImages = [
+  {
+    src: LetterC,
+    alt: "Letter C",
+  },
+
+  {
+    src: LetterU,
+    alt: "Letter U",
+  },
+  {
+    src: LetterB,
+    alt: "Letter B",
+  },
+  {
+    src: LetterO,
+    alt: "Letter O",
+  },
+  {
+    src: LetterS,
+    alt: "Letter S",
+  },
+];
+
 const HeaderLayout = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, signOutData } = useAuth();
@@ -43,31 +67,15 @@ const HeaderLayout = () => {
               alt="Square"
               className="w-[35px] h-[35px] md:mr-2 mr-0"
             />
-            <img
-              src={LetterC}
-              alt="Letter C"
-              className="w-[20px] h-[20px] md:block hidden"
-            />
-            <img
-              src={LetterU}
-              alt="Letter U"
-              className="w-[20px] h-[20px] md:block hidden"
-            />
-            <img
-              src={LetterB}
-              alt="Letter B"
-              className="w-[20px] h-[20px] md:block hidden"
-            />
-            <img
-              src={LetterO}
-              alt="Letter O"
-              className="w-[20px] h-[20px] md:block hidden"
-            />
-            <img
-              src={LetterS}
-              alt="Letter S"
-              className="w-[20px] h-[20px] md:block hidden"
-            />
+
+            {allImages?.map((image, index) => (
+              <img
+                key={index}
+                src={image.src}
+                alt={image.alt}
+                className="w-[20px] h-[20px] md:block hidden"
+              />
+            ))}
           </div>
           <p
             className="text-[20px] font-bold"

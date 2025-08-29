@@ -8,7 +8,6 @@ const FooterLayout = () => {
 
   const getFooterStyles = () => {
     return {
-      // backgroundColor: "var(--mauve-dark-1)",
       borderTop:
         theme === "light"
           ? "1px solid var(--mauve-3)"

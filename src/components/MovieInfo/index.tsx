@@ -1,9 +1,11 @@
 import { Progress } from "antd";
 import Text from "../Text";
 import Button from "../Button";
-import { useTheme } from "../../contexts/ThemeContext";
 import CardInfo from "../CardInfo";
+import DeleteConfirmModal from "../DeleteConfirmModal";
 import dayjs from "dayjs";
+import { useAuth } from "../../contexts/AuthContext";
+import { useState } from "react";
 
 interface MovieInfoProps {
   movie: ReadMovieDto;
@@ -12,18 +14,30 @@ interface MovieInfoProps {
 }
 
 const MovieInfo = ({ movie, onEdit, onDelete }: MovieInfoProps) => {
-  const { theme } = useTheme();
+  const { user } = useAuth();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const handleDeleteClick = () => {
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete();
+    setDeleteModalOpen(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+  };
 
   const formatCurrency = (value: number) => {
     if (!value) return "N/A";
-    return (
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(value / 1000000) + "M"
-    );
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
   const formatDuration = (minutes: number) => {
@@ -33,13 +47,13 @@ const MovieInfo = ({ movie, onEdit, onDelete }: MovieInfoProps) => {
     return `${hours}h${mins.toString().padStart(2, "0")}m`;
   };
 
-  const getSituationText = (situation: number) => {
+  const getSituationText = (situation: string) => {
     switch (situation) {
-      case 0:
+      case "upcoming":
         return "Em breve";
-      case 1:
+      case "released":
         return "Lançado";
-      case 2:
+      case "canceled":
         return "Cancelado";
       default:
         return "N/A";
@@ -64,17 +78,21 @@ const MovieInfo = ({ movie, onEdit, onDelete }: MovieInfoProps) => {
   return (
     <div className="space-y-6">
       {/* Botões de ação */}
-      <div className="md:flex justify-end space-x-3 hidden">
-        <Button variant="secondary" onClick={onDelete}>
-          Deletar
-        </Button>
-        <Button variant="primary" onClick={onEdit}>
-          Editar
-        </Button>
-      </div>
+
+      {user?.uuid === movie?.userUuid && (
+        <div className="md:flex justify-end space-x-3 hidden">
+          <Button variant="secondary" onClick={handleDeleteClick}>
+            Deletar
+          </Button>
+
+          <Button variant="primary" onClick={onEdit}>
+            Editar
+          </Button>
+        </div>
+      )}
 
       {/* Popularidade e votos */}
-      <div className="flex md:flex-row flex-col md:justify-end md:items-center gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 items-center justify-center gap-4">
         <CardInfo title="Popularidade" content={String(movie?.popularity)} />
 
         <CardInfo title="Votos" content={String(movie?.votesQuantity)} />
@@ -99,7 +117,16 @@ const MovieInfo = ({ movie, onEdit, onDelete }: MovieInfoProps) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="w-full md:hidden flex flex-col gap-4">
+        <CardInfo title="Sinopse" content={movie?.synopsis} />
+        <CardInfo
+          title="Gêneros"
+          content={""}
+          genders={movie?.genre.map((genre: any) => genre)}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <CardInfo
           title="Lançamento"
           content={
@@ -122,13 +149,28 @@ const MovieInfo = ({ movie, onEdit, onDelete }: MovieInfoProps) => {
         <CardInfo title="Idioma" content={getLanguageText(movie?.language)} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <CardInfo title="Orçamento" content={formatCurrency(movie?.budget)} />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <CardInfo
+          title="Orçamento (USD)"
+          content={formatCurrency(movie?.budget)}
+        />
 
-        <CardInfo title="Receita" content={formatCurrency(movie?.revenue)} />
+        <CardInfo
+          title="Receita (USD)"
+          content={formatCurrency(movie?.revenue)}
+        />
 
-        <CardInfo title="Lucro" content={String(movie?.profit)} />
+        <CardInfo title="Lucro (USD)" content={formatCurrency(movie?.profit)} />
       </div>
+
+      {/* Modal de confirmação de exclusão */}
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja deletar este filme?"
+      />
     </div>
   );
 };

@@ -110,7 +110,6 @@ export async function apiRequest<T>(
       return response.data;
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log("Requisição cancelada:", error.message);
         throw error;
       }
 

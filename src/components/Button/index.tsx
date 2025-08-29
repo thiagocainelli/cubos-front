@@ -72,11 +72,7 @@ const Button: React.FC<ButtonProps> = ({
           backgroundColor: "var(--button-bg-secondary)",
           color:
             theme === "light"
-              ? isTextBlack
-                ? "black"
-                : "var(--button-text)"
-              : isTextBlack
-              ? "white"
+              ? "var(--button-bg-primary)"
               : "var(--button-text)",
         };
       default:
