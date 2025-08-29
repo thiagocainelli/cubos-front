@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Input as AntInput } from "antd";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -51,48 +51,10 @@ const CurrencyUSDInput: React.FC<Props> = ({
   size = "medium",
   disabled,
   allowNegative = false,
-  config,
-  forceInteger,
 }) => {
   const { theme } = useTheme();
   const [display, setDisplay] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-
-  // Formatar valor para exibição
-  const formatCurrency = useCallback(
-    (numValue: number): string => {
-      const absValue = Math.abs(numValue);
-      const sign = numValue < 0 ? "-" : "";
-
-      // Se forceInteger for true, usar 0 casas decimais
-      const decimalPlaces = forceInteger ? 0 : config?.decimalPlaces || 2;
-
-      // Formatar número com separadores de milhares
-      let formatted = absValue.toFixed(decimalPlaces);
-
-      if (decimalPlaces > 0) {
-        const parts = formatted.split(".");
-        parts[0] = parts[0].replace(
-          /\B(?=(\d{3})+(?!\d))/g,
-          config?.thousandsSeparator || ","
-        );
-        formatted = parts.join(config?.decimalSeparator || ".");
-      } else {
-        formatted = formatted.replace(
-          /\B(?=(\d{3})+(?!\d))/g,
-          config?.thousandsSeparator || ","
-        );
-      }
-
-      // Adicionar símbolo da moeda
-      if (config?.position === "before") {
-        return `${sign}${config?.symbol || "$"} ${formatted}`;
-      } else {
-        return `${sign}${formatted} ${config?.symbol || "$"}`;
-      }
-    },
-    [config, forceInteger]
-  );
 
   // estilos iguais aos seus
   const inputStyle = useMemo(() => {

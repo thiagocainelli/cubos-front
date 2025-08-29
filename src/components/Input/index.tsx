@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
-import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { Input as AntInput } from "antd";
 
 interface InputProps {
@@ -29,7 +28,6 @@ const Input: React.FC<InputProps> = ({
 }) => {
   const { theme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const getInputStyles = () => {
     if (theme === "light") {
@@ -67,38 +65,12 @@ const Input: React.FC<InputProps> = ({
     }
   };
 
-  const getLabelStyles = () => {
-    return {
-      color: theme === "light" ? "var(--mauve-10)" : "var(--mauve-4)",
-    };
-  };
-
-  const getErrorStyles = () => {
-    return "text-red-500 text-sm mt-1";
-  };
-
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const getIconStyles = () => {
-    if (theme === "light") {
-      return {
-        color: "var(--mauve-10)",
-      };
-    } else {
-      return {
-        color: "var(--mauve-4)",
-      };
-    }
-  };
-
   return (
     <AntInput
-      type={showPassword ? "text" : type}
+      type={type}
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
